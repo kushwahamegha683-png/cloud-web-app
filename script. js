@@ -1,0 +1,150 @@
+const questions = [
+    {
+        question: "Which language is used to create the structure of a web page?",
+        options: ["HTML", "Python", "SQL", "Java"],
+        answer: "HTML"
+    },
+
+    {
+        question: "Which language is used for styling web pages?",
+        options: ["HTML", "CSS", "Python", "C++"],
+        answer: "CSS"
+    },
+
+    {
+        question: "Which technology is used to create interactive web pages?",
+        options: ["JavaScript", "SQL", "HTML", "MySQL"],
+        answer: "JavaScript"
+    },
+
+    {
+        question: "Which database is a NoSQL database?",
+        options: ["MongoDB", "HTML", "CSS", "React"],
+        answer: "MongoDB"
+    },
+
+    {
+        question: "What does API stand for?",
+        options: [
+            "Application Programming Interface",
+            "Advanced Program Internet",
+            "Application Process Input",
+            "Advanced Programming Interface"
+        ],
+        answer: "Application Programming Interface"
+    }
+];
+
+let currentQuestion = 0;
+let score = 0;
+let time = 120;
+
+function loadQuestion() {
+
+    if (currentQuestion >= questions.length) {
+        showResult();
+        return;
+    }
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("question").innerText =
+        (currentQuestion + 1) + ". " + q.question;
+
+    const optionsDiv = document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach(function(option) {
+
+        const label = document.createElement("label");
+
+        label.className = "option";
+
+        label.innerHTML =
+            '<input type="radio" name="answer" value="' +
+            option + '"> ' + option;
+
+        optionsDiv.appendChild(label);
+    });
+}
+
+function nextQuestion() {
+
+    const selected = document.querySelector(
+        'input[name="answer"]:checked'
+    );
+
+    if (!selected) {
+        alert("Please select an answer.");
+        return;
+    }
+
+    if (selected.value === questions[currentQuestion].answer) {
+        score++;
+    }
+
+    currentQuestion++;
+
+    loadQuestion();
+}
+
+function showResult() {
+
+    document.getElementById("quiz").style.display = "none";
+
+    document.getElementById("result").innerHTML =
+        "<h2>Exam Completed!</h2>" +
+        "<p>Your Score: " + score + " / " +
+        questions.length + "</p>" +
+        "<p>Percentage: " +
+        ((score / questions.length) * 100) +
+        "%</p>";
+}
+
+/* Timer */
+
+const timerInterval = setInterval(function() {
+
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+
+    document.getElementById("timer").innerText =
+        minutes + ":" + seconds;
+
+    time--;
+
+    if (time < 0) {
+
+        clearInterval(timerInterval);
+
+        alert("Time is over!");
+
+        showResult();
+    }
+
+}, 1000);
+
+
+/* Webcam Proctoring */
+
+navigator.mediaDevices.getUserMedia({
+    video: true
+})
+.then(function(stream) {
+
+    document.getElementById("video").srcObject = stream;
+
+})
+.catch(function(error) {
+
+    console.log("Camera permission denied.");
+
+});
+
+
+loadQuestion();
