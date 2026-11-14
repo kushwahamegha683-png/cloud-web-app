@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Examination & Proctoring Platform</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f5f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px gray;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #timer {
+            font-size: 25px;
+            color: red;
+        }
+
+        video {
+            width: 220px;
+            height: 160px;
+            border: 2px solid black;
+            border-radius: 8px;
+            background: black;
+        }
+
+        #options {
+            margin: 20px 0;
+        }
+
+        .option {
+            display: block;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .option:hover {
+            background-color: #eeeeee;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        .result {
+            text-align: center;
+            font-size: 22px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Online Examination & Proctoring Platform</h1>
+
+    <div class="top-section">
+
+        <div>
+            <h2>Online Exam</h2>
+            <p><b>Time Remaining:</b>
+            <span id="timer">02:00</span></p>
+        </div>
+
+        <div>
+            <video id="video" autoplay muted playsinline></video>
+            <p>Webcam Proctoring</p>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <div id="quiz">
+
+        <h2 id="question"></h2>
+
+        <div id="options"></div>
+
+        <button onclick="nextQuestion()">Next</button>
+
+    </div>
+
+    <div id="result" class="result"></div>
+
+</div>
+
+<script>
+
+const questions = [
+
+    {
+        question: "Which language is used to create the structure of a web page?",
+        options: ["HTML", "Python", "SQL", "Java"],
+        answer: "HTML"
+    },
+
+    {
+        question: "Which language is used for styling web pages?",
+        options: ["HTML", "CSS", "Python", "C++"],
+        answer: "CSS"
+    },
+
+    {
+        question: "Which technology is used to create interactive web pages?",
+        options: ["JavaScript", "SQL", "HTML", "MySQL"],
+        answer: "JavaScript"
+    },
+
+    {
+        question: "Which database is a NoSQL database?",
+        options: ["MongoDB", "HTML", "CSS", "React"],
+        answer: "MongoDB"
+    },
+
+    {
+        question: "What does API stand for?",
+        options: [
+            "Application Programming Interface",
+            "Advanced Program Internet",
+            "Application Process Input",
+            "Advanced Programming Interface"
+        ],
+        answer: "Application Programming Interface"
+    }
+
+];
+
+let currentQuestion = 0;
+let score = 0;
+let time = 120;
+let examFinished = false;
+
+function loadQuestion() {
+
+    if (currentQuestion >= questions.length) {
+        showResult();
+        return;
+    }
+
+    const q = questions[currentQuestion];
+
+    document.getElementById("question").innerText =
+        (currentQuestion + 1) + ". " + q.question;
+
+    const optionsDiv = document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+    q.options.forEach(function(option) {
+
+        const label = document.createElement("label");
+
+        label.className = "option";
+
+        label.innerHTML =
+            '<input type="radio" name="answer" value="' +
+            option + '"> ' + option;
+
+        optionsDiv.appendChild(label);
+
+    });
+
+}
+
+function nextQuestion() {
+
+    if (examFinished) return;
+
+    const selected = document.querySelector(
+        'input[name="answer"]:checked'
+    );
+
+    if (!selected) {
+        alert("Please select an answer.");
+        return;
+    }
+
+    if (selected.value === questions[currentQuestion].answer) {
+        score++;
+    }
+
+    currentQuestion++;
+
+    loadQuestion();
+
+}
+
+function showResult() {
+
+    if (examFinished) return;
+
+    examFinished = true;
+
+    clearInterval(timerInterval);
+
+    document.getElementById("quiz").style.display = "none";
+
+    document.getElementById("result").innerHTML =
+        "<h2>Exam Completed!</h2>" +
+        "<p>Your Score: " + score + " / " +
+        questions.length + "</p>" +
+        "<p>Percentage: " +
+        ((score / questions.length) * 100) +
+        "%</p>";
+
+}
+
+/* Timer */
+
+const timerInterval = setInterval(function() {
+
+    if (examFinished) return;
+
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+
+    document.getElementById("timer").innerText =
+        minutes + ":" + seconds;
+
+    time--;
+
+    if (time < 0) {
+
+        clearInterval(timerInterval);
+
+        alert("Time is over!");
+
+        showResult();
+
+    }
+
+}, 1000);
+
+/* Webcam Proctoring */
+
+navigator.mediaDevices.getUserMedia({
+    video: true
+})
+.then(function(stream) {
+
+    document.getElementById("video").srcObject = stream;
+
+})
+.catch(function(error) {
+
+    console.log("Camera permission denied.");
+
+});
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
