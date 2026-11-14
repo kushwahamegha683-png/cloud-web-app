@@ -9,7 +9,7 @@ const questions = [
         question: "Which language is used for styling web pages?",
         options: ["HTML", "CSS", "Python", "C++"],
         answer: "CSS"
-    },
+    }, 
 
     {
         question: "Which technology is used to create interactive web pages?",
